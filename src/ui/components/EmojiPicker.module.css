@@ -1,0 +1,29 @@
+.grid {
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.cell {
+  min-width: 48px;
+  min-height: 48px;
+  font-size: 26px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  transition: border-color 150ms, transform 100ms, background 150ms;
+}
+
+.cell:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.cell:active {
+  transform: scale(0.95);
+}
+
+.cell[aria-selected="true"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}

@@ -1,0 +1,278 @@
+{
+  "members": [
+    {
+      "id": "vuorio-pasi",
+      "name": "Pasi",
+      "color": "#3B82F6",
+      "avatar": "👨",
+      "createdAt": "2026-09-02T10:00:00.000Z",
+      "updatedAt": "2026-09-02T10:00:00.000Z"
+    },
+    {
+      "id": "vuorio-minna",
+      "name": "Minna",
+      "color": "#EC4899",
+      "avatar": "👩",
+      "createdAt": "2026-09-02T10:00:00.000Z",
+      "updatedAt": "2026-09-02T10:00:00.000Z"
+    },
+    {
+      "id": "vuorio-sini",
+      "name": "Sini",
+      "color": "#8B5CF6",
+      "avatar": "👧",
+      "createdAt": "2026-09-02T10:00:00.000Z",
+      "updatedAt": "2026-09-02T10:00:00.000Z"
+    },
+    {
+      "id": "vuorio-saara",
+      "name": "Saara",
+      "color": "#14B8A6",
+      "avatar": "👩‍🎓",
+      "createdAt": "2026-09-02T10:00:00.000Z",
+      "updatedAt": "2026-09-02T10:00:00.000Z"
+    },
+    {
+      "id": "vuorio-miska",
+      "name": "Miska",
+      "color": "#F59E0B",
+      "avatar": "👦",
+      "createdAt": "2026-09-02T10:00:00.000Z",
+      "updatedAt": "2026-09-02T10:00:00.000Z"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "task-dishes",
+      "title": "Dishes",
+      "icon": "🍽️",
+      "schedule": {
+        "type": "daily"
+      },
+      "assignment": {
+        "type": "rotation",
+        "memberIds": [
+          "vuorio-pasi",
+          "vuorio-minna",
+          "vuorio-sini",
+          "vuorio-saara",
+          "vuorio-miska"
+        ]
+      },
+      "points": 10,
+      "active": true,
+      "createdAt": "2026-09-02T10:00:00.000Z",
+      "updatedAt": "2026-09-02T10:00:00.000Z"
+    },
+    {
+      "id": "task-trash",
+      "title": "Trash",
+      "icon": "🗑️",
+      "schedule": {
+        "type": "daily"
+      },
+      "assignment": {
+        "type": "rotation",
+        "memberIds": [
+          "vuorio-pasi",
+          "vuorio-minna",
+          "vuorio-sini",
+          "vuorio-saara",
+          "vuorio-miska"
+        ]
+      },
+      "points": 10,
+      "active": true,
+      "createdAt": "2026-09-02T10:00:00.000Z",
+      "updatedAt": "2026-09-02T10:00:00.000Z"
+    },
+    {
+      "id": "task-counters",
+      "title": "Kitchen counters",
+      "icon": "🧽",
+      "schedule": {
+        "type": "daily"
+      },
+      "assignment": {
+        "type": "rotation",
+        "memberIds": [
+          "vuorio-minna",
+          "vuorio-sini",
+          "vuorio-saara",
+          "vuorio-miska"
+        ]
+      },
+      "points": 8,
+      "active": true,
+      "createdAt": "2026-09-02T10:00:00.000Z",
+      "updatedAt": "2026-09-02T10:00:00.000Z"
+    },
+    {
+      "id": "task-vacuum",
+      "title": "Vacuum",
+      "icon": "🧹",
+      "schedule": {
+        "type": "weekly",
+        "day": 6
+      },
+      "assignment": {
+        "type": "rotation",
+        "memberIds": [
+          "vuorio-pasi",
+          "vuorio-minna",
+          "vuorio-sini",
+          "vuorio-saara",
+          "vuorio-miska"
+        ]
+      },
+      "points": 15,
+      "active": true,
+      "createdAt": "2026-09-02T10:00:00.000Z",
+      "updatedAt": "2026-09-02T10:00:00.000Z"
+    },
+    {
+      "id": "task-laundry",
+      "title": "Laundry",
+      "icon": "🧺",
+      "schedule": {
+        "type": "weekly",
+        "day": 7
+      },
+      "assignment": {
+        "type": "rotation",
+        "memberIds": [
+          "vuorio-minna",
+          "vuorio-sini",
+          "vuorio-saara"
+        ]
+      },
+      "points": 20,
+      "active": true,
+      "createdAt": "2026-09-02T10:00:00.000Z",
+      "updatedAt": "2026-09-02T10:00:00.000Z"
+    },
+    {
+      "id": "task-tidy",
+      "title": "Tidy living room",
+      "icon": "🛋️",
+      "schedule": {
+        "type": "weekdays",
+        "days": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "assignment": {
+        "type": "pool"
+      },
+      "points": 12,
+      "active": true,
+      "createdAt": "2026-09-02T10:00:00.000Z",
+      "updatedAt": "2026-09-02T10:00:00.000Z"
+    },
+    {
+      "id": "task-recycling",
+      "title": "Recycling",
+      "icon": "♻️",
+      "schedule": {
+        "type": "daily"
+      },
+      "assignment": {
+        "type": "pool"
+      },
+      "points": 8,
+      "active": true,
+      "createdAt": "2026-09-02T10:00:00.000Z",
+      "updatedAt": "2026-09-02T10:00:00.000Z"
+    },
+    {
+      "id": "task-dinner-prep",
+      "title": "Dinner prep help",
+      "icon": "🍳",
+      "schedule": {
+        "type": "weekdays",
+        "days": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "assignment": {
+        "type": "rotation",
+        "memberIds": [
+          "vuorio-pasi",
+          "vuorio-minna",
+          "vuorio-sini",
+          "vuorio-saara"
+        ]
+      },
+      "points": 12,
+      "active": true,
+      "createdAt": "2026-09-02T10:00:00.000Z",
+      "updatedAt": "2026-09-02T10:00:00.000Z"
+    },
+    {
+      "id": "task-yard",
+      "title": "Yard / outdoor",
+      "icon": "🌱",
+      "schedule": {
+        "type": "weekly",
+        "day": 6
+      },
+      "assignment": {
+        "type": "rotation",
+        "memberIds": [
+          "vuorio-pasi",
+          "vuorio-miska",
+          "vuorio-saara"
+        ]
+      },
+      "points": 18,
+      "active": true,
+      "createdAt": "2026-09-02T10:00:00.000Z",
+      "updatedAt": "2026-09-02T10:00:00.000Z"
+    }
+  ],
+  "completions": [],
+  "overrides": [],
+  "rewards": [
+    {
+      "id": "reward-movie",
+      "title": "Movie night",
+      "cost": 50,
+      "active": true,
+      "createdAt": "2026-09-02T10:00:00.000Z",
+      "updatedAt": "2026-09-02T10:00:00.000Z"
+    },
+    {
+      "id": "reward-dinner",
+      "title": "Choose dinner",
+      "cost": 40,
+      "active": true,
+      "createdAt": "2026-09-02T10:00:00.000Z",
+      "updatedAt": "2026-09-02T10:00:00.000Z"
+    },
+    {
+      "id": "reward-sleepin",
+      "title": "Sleep in Saturday",
+      "cost": 30,
+      "active": true,
+      "createdAt": "2026-09-02T10:00:00.000Z",
+      "updatedAt": "2026-09-02T10:00:00.000Z"
+    }
+  ],
+  "redemptions": [],
+  "settings": {
+    "weekStartsOn": 1,
+    "locale": "en"
+  },
+  "meta": {
+    "schemaVersion": 1,
+    "lastModified": "2026-09-02T10:00:00.000Z"
+  }
+}

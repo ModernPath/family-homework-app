@@ -1,0 +1,27 @@
+.popup {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--success);
+  animation: fade 800ms ease-out forwards;
+}
+
+@keyframes fade {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}
