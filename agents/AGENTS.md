@@ -155,7 +155,6 @@ Add a row when you create an agent. Other projects that copy this kit should rep
 | Agent | Description | Status |
 |-------|-------------|--------|
 | `homework-coach-agent` | **Reference example.** Who should do which chore and when; who has done the most. CLI, FastAPI `:8001`, Flask `:5001`. | Active |
-| `recipe-finder-agent` | Ingredient-aware recipe discovery, ranking, substitutions, pantry. | Active |
 
 ---
 
