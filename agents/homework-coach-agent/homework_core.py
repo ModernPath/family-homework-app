@@ -547,9 +547,37 @@ def _week_occurrence_for_titles(
     return None
 
 
-def _focused_member_lines(plan: Dict[str, Any], names: List[str], locale: str) -> List[str]:
+def _upcoming_member_chores(
+    week_plan: Dict[str, Any],
+    member_name: str,
+    today: str,
+) -> List[str]:
+    """Chore bits for this person on later days this ISO week."""
+    wanted = member_name.lower()
+    bits: List[str] = []
+    for day in week_plan.get("days") or []:
+        if str(day.get("date") or "") <= today:
+            continue
+        weekday = day.get("weekday") or day.get("date")
+        for row in day.get("by_member") or []:
+            if str(row.get("member_name") or "").lower() != wanted:
+                continue
+            for task in row.get("tasks") or []:
+                bits.append(
+                    f"{task.get('icon', '')} {task.get('title')} ({weekday})".strip()
+                )
+    return bits
+
+
+def _focused_member_lines(
+    plan: Dict[str, Any],
+    names: List[str],
+    locale: str,
+    week_plan: Optional[Dict[str, Any]] = None,
+) -> List[str]:
     """Answer only about people named in the question."""
     wanted = {name.lower() for name in names}
+    today = str(plan.get("date") or "")
     lines: List[str] = []
     for row in plan.get("by_member") or []:
         member_name = str(row.get("member_name") or "")
@@ -558,10 +586,18 @@ def _focused_member_lines(plan: Dict[str, Any], names: List[str], locale: str) -
         formatted = _format_member_tasks(row, locale)
         if formatted:
             lines.append(formatted)
-        elif locale == "fi":
-            lines.append(f"- {member_name}: ei nimettyjä tehtäviä tänään.")
+            continue
+        empty = (
+            f"- {member_name}: ei nimettyjä tehtäviä tänään."
+            if locale == "fi"
+            else f"- {member_name}: no assigned chores today."
+        )
+        upcoming = _upcoming_member_chores(week_plan or {}, member_name, today)
+        if upcoming:
+            nxt = "Seuraavana" if locale == "fi" else "Next"
+            lines.append(f"{empty} {nxt}: {'; '.join(upcoming)}.")
         else:
-            lines.append(f"- {member_name}: no assigned chores today.")
+            lines.append(empty)
     return lines
 
 
@@ -653,7 +689,7 @@ def render_answer(
         return "\n".join(focused + extra)
 
     people = mentioned_members or []
-    member_lines = _focused_member_lines(plan, people, locale)
+    member_lines = _focused_member_lines(plan, people, locale, week_plan)
     if people and member_lines and intent in {"plan", "both"}:
         extra = []
         if intent == "both":

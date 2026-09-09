@@ -497,3 +497,50 @@ def test_answer_finnish_inflected_name_still_finds_points():
     assert "Emma" in result["answer"]
     assert "eniten" not in result["answer"]
     assert "Dad" not in result["answer"]
+
+
+def test_answer_what_should_person_do_mentions_upcoming_week_chore():
+    household = {
+        "members": [member("m1", "Emma"), member("m2", "Dad")],
+        "tasks": [
+            {
+                "id": "vacuum",
+                "title": "Vacuum",
+                "icon": "🧹",
+                "schedule": {"type": "once", "date": "2026-09-05"},
+                "assignment": {"type": "rotation", "memberIds": ["m1"]},
+                "points": 10,
+                "active": True,
+            }
+        ],
+        "completions": [],
+        "overrides": [],
+    }
+    result = answer_query(household, "What should Emma do?", date="2026-09-02")
+    assert "Emma" in result["answer"]
+    assert "no assigned chores today" in result["answer"]
+    assert "Vacuum" in result["answer"]
+    assert "Saturday" in result["answer"]
+    assert "Dad:" not in result["answer"]
+
+
+def test_answer_what_should_person_do_empty_when_nothing_this_week():
+    household = {
+        "members": [member("m1", "Emma"), member("m2", "Dad")],
+        "tasks": [
+            {
+                "id": "tidy",
+                "title": "Tidy",
+                "icon": "🧹",
+                "schedule": {"type": "daily"},
+                "assignment": {"type": "rotation", "memberIds": ["m2"]},
+                "points": 10,
+                "active": True,
+            }
+        ],
+        "completions": [],
+        "overrides": [],
+    }
+    result = answer_query(household, "What should Emma do?", date="2026-09-02")
+    assert result["answer"] == "- Emma: no assigned chores today."
+    assert "Tidy" not in result["answer"]
