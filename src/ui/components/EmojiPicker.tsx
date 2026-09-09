@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n/useTranslation";
 import styles from "./EmojiPicker.module.css";
 
 const EMOJIS = [
@@ -12,8 +13,9 @@ interface EmojiPickerProps {
 }
 
 export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
+  const { t } = useTranslation();
   return (
-    <div className={`${styles.grid} picker-grid`} role="listbox" aria-label="Choose an icon">
+    <div className={`${styles.grid} picker-grid`} role="listbox" aria-label={t("tasks.chooseIcon")}>
       {EMOJIS.map((emoji) => (
         <button
           key={emoji}

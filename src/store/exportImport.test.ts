@@ -61,4 +61,22 @@ describe("exportImport", () => {
 
     expect(getBackupPreview(h)).toEqual({ memberCount: 1, taskCount: 1 });
   });
+
+  it("keeps Finnish locale on import", () => {
+    const h = createEmptyHousehold(NOW, "fi");
+    const parsed = parseBackup(serializeHousehold(h));
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    expect(parsed.value.settings.locale).toBe("fi");
+  });
+
+  it("normalizes unknown import locale to en", () => {
+    const h = createEmptyHousehold(NOW, "en");
+    const raw = JSON.parse(serializeHousehold(h)) as { settings: { locale: string } };
+    raw.settings.locale = "sv";
+    const parsed = parseBackup(JSON.stringify(raw));
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    expect(parsed.value.settings.locale).toBe("en");
+  });
 });

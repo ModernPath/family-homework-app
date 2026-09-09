@@ -1,4 +1,5 @@
 import { MEMBER_COLOR_PALETTE } from "@/domain/types";
+import { useTranslation } from "@/i18n/useTranslation";
 
 interface ColorSwatchesProps {
   value: string;
@@ -6,8 +7,9 @@ interface ColorSwatchesProps {
 }
 
 export function ColorSwatches({ value, onChange }: ColorSwatchesProps) {
+  const { t } = useTranslation();
   return (
-    <div className="color-swatches" role="radiogroup" aria-label="Color">
+    <div className="color-swatches" role="radiogroup" aria-label={t("members.color")}>
       {MEMBER_COLOR_PALETTE.map((color) => (
         <button
           key={color}

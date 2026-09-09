@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useTranslation } from "@/i18n/useTranslation";
 
 interface ConfirmDialogProps {
   message: string;
@@ -13,8 +14,10 @@ export function ConfirmDialog({
   preview,
   onCancel,
   onConfirm,
-  confirmLabel = "Confirm",
+  confirmLabel,
 }: ConfirmDialogProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="dialog-backdrop" role="dialog" aria-modal="true">
       <div className="dialog">
@@ -22,10 +25,10 @@ export function ConfirmDialog({
         <p>{message}</p>
         <div className="dialog-actions">
           <button type="button" className="btn btn-secondary" onClick={onCancel}>
-            Cancel
+            {t("common.cancel")}
           </button>
           <button type="button" className="btn btn-primary" onClick={onConfirm}>
-            {confirmLabel}
+            {confirmLabel ?? t("common.confirm")}
           </button>
         </div>
       </div>

@@ -1,6 +1,10 @@
+import { detectBrowserLocale } from "@/i18n/detectLocale";
 import type { Household } from "./types";
 
-export function createEmptyHousehold(now: Date = new Date()): Household {
+export function createEmptyHousehold(
+  now: Date = new Date(),
+  locale = detectBrowserLocale(),
+): Household {
   const iso = now.toISOString();
   return {
     members: [],
@@ -11,7 +15,7 @@ export function createEmptyHousehold(now: Date = new Date()): Household {
     redemptions: [],
     settings: {
       weekStartsOn: 1,
-      locale: "en",
+      locale,
     },
     meta: {
       schemaVersion: 1,

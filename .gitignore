@@ -4,9 +4,15 @@ dev-dist/
 .env
 .env.*
 !.env.example
+!agents/**/.env.example
 .DS_Store
 *.local
 coverage/
 .vite/
 *.log
 scripts/*.png
+public/sql-wasm.wasm
+public/sql-wasm-browser.wasm
+agents/**/__pycache__/
+agents/**/memory/data/*.json
+!agents/**/memory/data/.gitkeep

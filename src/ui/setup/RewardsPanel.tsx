@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { useHousehold } from "@/hooks/HouseholdProvider";
+import { useTranslation } from "@/i18n/useTranslation";
 import {
   addReward,
   deactivateReward,
-  formatDeactivateRewardMessage,
-  formatRedeemConfirmMessage,
   redeemReward,
 } from "@/domain/rewards";
 import { ConfirmDialog } from "@/ui/components/ConfirmDialog";
 
 export function RewardsPanel() {
   const { household, dispatch } = useHousehold();
+  const { t, te } = useTranslation();
   const [title, setTitle] = useState("");
   const [cost, setCost] = useState(50);
   const [memberId, setMemberId] = useState("");
@@ -32,7 +32,8 @@ export function RewardsPanel() {
             <div className="item-card__body">
               <p className="item-card__title">{reward.title}</p>
               <p className="item-card__meta">
-                {reward.cost} pts {reward.active ? "" : "· inactive"}
+                {reward.cost} {t("common.pts")}{" "}
+                {reward.active ? "" : `· ${t("common.inactive")}`}
               </p>
             </div>
             {reward.active && (
@@ -45,7 +46,7 @@ export function RewardsPanel() {
                     setError(null);
                   }}
                 >
-                  Deactivate
+                  {t("common.deactivate")}
                 </button>
               </div>
             )}
@@ -65,19 +66,19 @@ export function RewardsPanel() {
               setTitle("");
               setError(null);
             } else {
-              setError(result.error);
+              setError(te(result.error));
             }
             return result;
           });
         }}
       >
-        <h2 className="section-title">Add reward</h2>
+        <h2 className="section-title">{t("rewards.add")}</h2>
         <div className="form-field">
-          <label htmlFor="reward-title">Title</label>
+          <label htmlFor="reward-title">{t("rewards.title")}</label>
           <input id="reward-title" value={title} onChange={(e) => setTitle(e.target.value)} />
         </div>
         <div className="form-field">
-          <label htmlFor="reward-cost">Cost</label>
+          <label htmlFor="reward-cost">{t("rewards.cost")}</label>
           <input
             id="reward-cost"
             type="number"
@@ -88,17 +89,17 @@ export function RewardsPanel() {
         </div>
         <div className="form-actions">
           <button type="submit" className="btn btn-primary">
-            Save
+            {t("common.save")}
           </button>
         </div>
       </form>
 
       <form className="setup-form">
-        <h2 className="section-title">Redeem</h2>
+        <h2 className="section-title">{t("rewards.redeem")}</h2>
         <div className="form-field">
-          <label htmlFor="redeem-member">Member</label>
+          <label htmlFor="redeem-member">{t("rewards.member")}</label>
           <select id="redeem-member" value={memberId} onChange={(e) => setMemberId(e.target.value)}>
-            <option value="">Select member</option>
+            <option value="">{t("common.selectMember")}</option>
             {household.members.map((m) => (
               <option key={m.id} value={m.id}>
                 {m.name}
@@ -107,14 +108,14 @@ export function RewardsPanel() {
           </select>
         </div>
         <div className="form-field">
-          <label htmlFor="redeem-reward">Reward</label>
+          <label htmlFor="redeem-reward">{t("rewards.reward")}</label>
           <select id="redeem-reward" value={rewardId} onChange={(e) => setRewardId(e.target.value)}>
-            <option value="">Select reward</option>
+            <option value="">{t("common.selectReward")}</option>
             {household.rewards
               .filter((r) => r.active)
               .map((r) => (
                 <option key={r.id} value={r.id}>
-                  {r.title} ({r.cost} pts)
+                  {r.title} ({r.cost} {t("common.pts")})
                 </option>
               ))}
           </select>
@@ -127,13 +128,19 @@ export function RewardsPanel() {
               const member = household.members.find((m) => m.id === memberId);
               const reward = household.rewards.find((r) => r.id === rewardId);
               if (!member || !reward) {
-                setError("Select member and reward");
+                setError(t("rewards.selectBoth"));
                 return;
               }
-              setConfirm(formatRedeemConfirmMessage(reward.title, member.name, reward.cost));
+              setConfirm(
+                t("rewards.redeemConfirm", {
+                  title: reward.title,
+                  name: member.name,
+                  cost: reward.cost,
+                }),
+              );
             }}
           >
-            Redeem
+            {t("rewards.redeem")}
           </button>
         </div>
       </form>
@@ -148,7 +155,7 @@ export function RewardsPanel() {
           onConfirm={() => {
             void dispatch((h) => {
               const result = redeemReward(h, rewardId, memberId, today);
-              if (!result.ok) setError(result.error);
+              if (!result.ok) setError(te(result.error));
               else {
                 setError(null);
                 setConfirm(null);
@@ -161,12 +168,12 @@ export function RewardsPanel() {
 
       {deactivateTarget && (
         <ConfirmDialog
-          message={formatDeactivateRewardMessage(deactivateTarget.title)}
+          message={t("rewards.deactivateConfirm", { title: deactivateTarget.title })}
           onCancel={() => setDeactivateTargetId(null)}
           onConfirm={() => {
             void dispatch((h) => {
               const result = deactivateReward(h, deactivateTarget.id);
-              if (!result.ok) setError(result.error);
+              if (!result.ok) setError(te(result.error));
               else setDeactivateTargetId(null);
               return result;
             });

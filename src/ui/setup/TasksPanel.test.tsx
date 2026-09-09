@@ -185,4 +185,22 @@ describe("TasksPanel", () => {
       expect((await store.load()).tasks[0]!.active).toBe(false);
     });
   });
+
+  it("labels the icon picker in Finnish", async () => {
+    const store = createInMemoryStore();
+    let h = createEmptyHousehold(NOW, "fi");
+    const added = addMember(h, { name: "Emma", color: "#3B82F6" }, NOW);
+    if (!added.ok) throw new Error(added.error);
+    await store.save(added.value);
+
+    render(
+      <HouseholdProvider store={store}>
+        <TasksPanel />
+      </HouseholdProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("listbox", { name: "Valitse kuvake" })).toBeTruthy();
+    });
+  });
 });

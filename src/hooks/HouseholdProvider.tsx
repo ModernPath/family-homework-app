@@ -40,12 +40,19 @@ export function HouseholdProvider({
   useEffect(() => {
     let active = true;
 
-    void store.load().then((loaded) => {
-      if (active) {
-        setHousehold(loaded);
-        setLoading(false);
-      }
-    });
+    void store.load().then(
+      (loaded) => {
+        if (active) {
+          setHousehold(loaded);
+          setLoading(false);
+        }
+      },
+      () => {
+        if (active) {
+          setLoading(false);
+        }
+      },
+    );
 
     const unsubscribe = store.subscribe((next) => {
       setHousehold(next);

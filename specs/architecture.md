@@ -39,11 +39,11 @@
                             │ read/write Household
 ┌───────────────────────────▼─────────────────────────────┐
 │  Store Layer           persistence abstraction            │
-│  (interface)           IndexedDbStore (v1)                │
+│  (interface)           SqliteStore (sql.js + OPFS)        │
 └─────────────────────────────────────────────────────────┘
 ```
 
-**Rule:** Dependencies point downward only. Domain never imports from `ui/`, `store/indexedDbStore.ts`, or React.
+**Rule:** Dependencies point downward only. Domain never imports from `ui/`, `store/sqliteStore.ts`, or React.
 
 ---
 
@@ -71,7 +71,9 @@ family-homework-app/
 │   │   └── seed.ts               # empty household factory
 │   ├── store/
 │   │   ├── store.ts              # Store interface
-│   │   ├── indexedDbStore.ts     # v1 implementation
+│   │   ├── sqliteStore.ts        # v1 production store (sql.js)
+│   │   ├── byteStore.ts          # OPFS / memory sqlite file bytes
+│   │   ├── indexedDbStore.ts     # one-time migrate from v1 IDB
 │   │   ├── inMemoryStore.ts      # tests
 │   │   └── exportImport.ts
 │   ├── hooks/
@@ -136,12 +138,15 @@ interface Store {
 
 | Implementation | Use |
 |----------------|-----|
-| `InMemoryStore` | Unit tests, Storybook (optional) |
-| `IndexedDbStore` | Production v1 |
+| `InMemoryStore` | Unit tests |
+| `SqliteStore` | Production v1 (sql.js, OPFS file `family-task-board.sqlite`) |
+| `IndexedDbStore` | Read-only peek for one-time migrate |
 
 **IndexedDB key:** database `family-task-board`, store `household`, key `"default"`.
 
 **v2 extension (not built now):** `LanStore implements Store` backed by `fetch('/api/household')` + WebSocket push. UI and domain unchanged.
+
+**Optional homework coach:** `agents/homework-coach-agent/` is a separate Python process (FastAPI on port 8001). The React Coach view POSTs the in-browser household JSON to `/agent-api/coach/ask`. Domain rules stay in TypeScript; the agent reimplements the same rotation/points math for explanations only. The kitchen board still works if the API is down.
 
 ---
 
@@ -192,6 +197,7 @@ Exact error strings match feature specs (`"Name is required"`, etc.).
 |------|------|---------|
 | `/` | TodayView | yes |
 | `/week` | WeekView | |
+| `/coach` | CoachView (posts household snapshot to the Python homework-coach API) | |
 | `/setup` | SetupView (sub-tabs via `?tab=members\|tasks\|rewards\|backup` or internal state) | |
 
 React Router v6+, `BrowserRouter`. No lazy routes in MVP (bundle stays small).

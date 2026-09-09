@@ -8,7 +8,7 @@ The household needs named, visually distinct identities on the shared board with
 
 Add member CRUD in Setup: create with name, color, and optional emoji avatar; edit existing fields; remove member with defined behavior when referenced by tasks. Enforce a hard cap of 6 active members. Persist members with `id`, `name`, `color` (hex `#RRGGBB`), optional `avatar` (single emoji string), `createdAt`, and `updatedAt` ISO-8601 timestamps.
 
-**Assumption (PRD open decisions):** UI copy and date formatting use English (`en`) for v1.
+**Decision (PRD OD-6):** UI supports English and Finnish. New households auto-detect from `navigator.languages` (Finnish → `fi`, otherwise `en`). Locale is stored in `household.settings.locale` and can be switched from the main nav (EN | FI). Date formatting follows the active locale via `date-fns` locales.
 
 ## Acceptance Criteria
 

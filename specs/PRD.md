@@ -50,7 +50,7 @@ Existing apps typically require accounts, cloud sync, or phone-first UX. This pr
 - Private/hidden per-member tasks
 - Push notifications or reminders
 - Photo proof of completion
-- Localization beyond one language (see Open Decisions)
+- Localization beyond English and Finnish
 
 ---
 
@@ -320,7 +320,7 @@ These were not confirmed in discovery. v1 implementation should not proceed on a
 | OD-3 | **Away / sick days** | Skip · Backup assignee · Manual swap only | Week view, rotation logic |
 | OD-4 | **Pool completion** | Claim then complete · One-tap complete | Today interaction model |
 | OD-5 | **Time of day** | Whole day only · Morning / afternoon / evening buckets | Today layout, schedule model |
-| OD-6 | **Language** | Finnish · English · Both | Copy, date formatting |
+| OD-6 | **Language** | ~~Finnish · English · Both~~ **Resolved: both** — browser autodetect on first run; user-selectable `en` / `fi` in nav, persisted with household | Copy, date formatting |
 | OD-7 | **Automatic backup** | Manual export only · Auto backup to LAN path (pre-sync) | Setup, infrastructure |
 | OD-8 | **Screensaver / burn-in** | None in v1 · Dim/rotate after idle | Kiosk behavior |
 | OD-9 | **Point display period** | All-time · Current week · Both | Activity strip, gamification |
@@ -330,7 +330,7 @@ These were not confirmed in discovery. v1 implementation should not proceed on a
 ## 17. Phasing
 
 ### v1 (MVP)
-Members, tasks (rotation + pool), Today + Week + Setup, points, weekly activity highlight, export/import, local persistence, PWA-friendly wall UX.
+Members, tasks (rotation + pool), Today + Week + Setup, points, weekly activity highlight, export/import, local persistence, PWA-friendly wall UX, English/Finnish locale (OD-6).
 
 ### v1.1 (likely next)
 Redeemable rewards (if OD-1 = B), away mode, missed-chore policy, screensaver.

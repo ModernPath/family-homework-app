@@ -6,7 +6,7 @@ The kitchen tablet must answer “who does what today?” within seconds. Today 
 
 ## Proposed Change
 
-Route `/` (or app default) renders Today view. Header shows local date formatted exactly as `Wednesday, Sep 2` (English locale `en-US`, abbreviated month, no year). Layout: (1) `Anyone` pool section at top, (2) member task area below with tab bar when members > 1 — each tab shows member avatar/emoji + name, default tab is first member by `createdAt`, (3) activity strip at bottom. Each member panel lists only today's incomplete and complete rotation tasks assigned to that member. Task cards show emoji, title, checkbox; minimum tap target 48×48 px (CSS). Nav links labeled exactly `Week` and `Setup`. On first load after app open, Today is visible within 1000 ms on a reference device (PRD NFR).
+Route `/` (or app default) renders Today view. Header shows local date: English `Wednesday, Sep 2`; Finnish `keskiviikkona 2.9.` (see `specs/features/i18n.md`). Layout: (1) `Anyone` pool section at top, (2) member task area below with tab bar when members > 1 — each tab shows member avatar/emoji + name, default tab is first member by `createdAt`, (3) activity strip at bottom. Each member panel lists only today's incomplete and complete rotation tasks assigned to that member. Task cards show emoji, title, checkbox; minimum tap target 48×48 px (CSS). Nav links labeled exactly `Week` and `Setup`. On first load after app open, Today is visible within 1000 ms on a reference device (PRD NFR).
 
 **Assumption (OD-2):** Yesterday's incomplete rotation tasks are not shown today.
 
@@ -17,7 +17,7 @@ Route `/` (or app default) renders Today view. Header shows local date formatted
 ### AC1: Default route is Today
 **Given** the app loads with any household state  
 **When** the initial route resolves  
-**Then** the visible primary heading date matches today's local date in format `Wednesday, Sep 2` and URL path is `/`
+**Then** the visible primary heading date matches today's local date (`Wednesday, Sep 2` when locale is `en`, `keskiviikkona 2.9.` when locale is `fi` on 2026-09-02) and URL path is `/`
 
 ### AC2: Anyone section above member tabs
 **Given** at least one pool task scheduled today  

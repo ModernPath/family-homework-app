@@ -13,6 +13,20 @@ function record(step) {
   checks.push(step);
 }
 
+async function ensureLocale(page, locale) {
+  const btn = page.locator(`.language-switcher__btn`, { hasText: locale.toUpperCase() });
+  await btn.waitFor({ timeout: 5000 });
+  const pressed = await btn.getAttribute("aria-pressed");
+  if (pressed !== "true") {
+    await btn.click();
+    await page.waitForFunction(
+      (loc) => document.documentElement.lang === loc,
+      locale,
+      { timeout: 3000 },
+    );
+  }
+}
+
 const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage();
 
@@ -23,6 +37,7 @@ page.on("console", (msg) => {
 
 try {
   await page.goto(BASE, { waitUntil: "networkidle", timeout: 15000 });
+  await ensureLocale(page, "en");
 
   assert(
     (await page.locator("nav a", { hasText: "Today" }).count()) === 1,
@@ -32,7 +47,7 @@ try {
     (await page.locator(".section-title", { hasText: "Anyone" }).count()) === 1,
     "Anyone section missing",
   );
-  record("today shell");
+  record("today shell (en)");
 
   await page.locator("nav a", { hasText: "Setup" }).click();
   await page.waitForURL("**/setup");
@@ -84,16 +99,24 @@ try {
   await page.locator("nav a", { hasText: "Today" }).click();
   await page.waitForURL("**/");
 
-  const taskCheckbox = page.getByRole("checkbox", { name: "Dishes" });
-  await taskCheckbox.waitFor({ timeout: 5000 });
-  await taskCheckbox.click();
+  let rotationDone = false;
+  for (const member of ["Emma", "Dad"]) {
+    await page.getByRole("tab", { name: new RegExp(member) }).click();
+    const taskCheckbox = page.getByRole("checkbox", { name: "Dishes" });
+    if (await taskCheckbox.isVisible().catch(() => false)) {
+      await taskCheckbox.click();
+      rotationDone = true;
+      break;
+    }
+  }
+  assert(rotationDone, "Dishes rotation task not visible on Emma or Dad tab");
   await page.waitForSelector("text=+10 pts", { timeout: 3000 });
   record("rotation complete");
 
   const poolCard = page.getByRole("checkbox", { name: "Tidy" });
   await poolCard.waitFor({ timeout: 5000 });
   await poolCard.click();
-  await page.getByRole("dialog", { name: "Choose member" }).waitFor({ timeout: 3000 });
+  await page.getByRole("dialog", { name: /Who did it/i }).waitFor({ timeout: 3000 });
   await page.getByRole("button", { name: /Emma/ }).click();
   await page.waitForSelector("text=+10 pts", { timeout: 3000 });
   record("pool complete");
@@ -115,7 +138,33 @@ try {
     (await page.locator(".week-grid").getByText("Dishes").count()) >= 1,
     "Week grid missing rotation task",
   );
-  record("week view");
+  record("week view (en)");
+
+  await page.locator("nav a", { hasText: "Coach" }).click();
+  await page.waitForURL("**/coach");
+  assert(
+    (await page.locator(".page-title", { hasText: "Coach" }).count()) === 1,
+    "Coach view title missing",
+  );
+  assert(
+    (await page.getByRole("button", { name: "Today's plan" }).count()) === 1,
+    "Coach Today's plan button missing",
+  );
+  record("coach view (en)");
+
+  // Finnish locale smoke
+  await ensureLocale(page, "fi");
+  assert(
+    (await page.locator("nav a", { hasText: "Tänään" }).count()) === 1,
+    "Finnish Today nav missing",
+  );
+  await page.locator("nav a", { hasText: "Asetukset" }).click();
+  await page.waitForURL("**/setup");
+  assert(
+    (await page.getByRole("tab", { name: "Jäsenet" }).count()) === 1,
+    "Finnish setup tabs missing",
+  );
+  record("locale fi");
 
   await page.screenshot({ path: "scripts/browser-smoke-week.png", fullPage: true });
 } finally {

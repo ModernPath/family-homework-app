@@ -78,6 +78,33 @@ a:focus-visible {
   box-shadow: var(--shadow-sm);
 }
 
+.language-switcher {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-left: auto;
+  padding: 8px 0;
+}
+
+.language-switcher__btn {
+  min-height: 48px;
+  min-width: 48px;
+  padding: 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text-muted);
+}
+
+.language-switcher__btn--active {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
 .app-nav a {
   min-height: 48px;
   min-width: 72px;
@@ -864,4 +891,85 @@ fieldset legend {
 
 .backup-actions .btn {
   width: 100%;
+}
+
+/* ── Coach ── */
+
+.coach-subtitle {
+  margin: -8px 0 20px;
+  color: var(--text-muted);
+  font-size: 16px;
+}
+
+.coach-prompts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.coach-ask {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.coach-ask textarea {
+  min-height: 72px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  resize: vertical;
+}
+
+.coach-ask .btn {
+  align-self: flex-start;
+  min-height: 48px;
+}
+
+.coach-answer {
+  background: var(--accent-soft);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-bottom: 20px;
+}
+
+.coach-answer__text {
+  margin: 0;
+  white-space: pre-wrap;
+  font-size: 18px;
+  line-height: 1.45;
+}
+
+.coach-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.coach-card__name {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.coach-task-list {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.coach-leaderboard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.coach-error {
+  color: var(--danger);
 }

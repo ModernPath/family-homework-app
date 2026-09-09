@@ -11,6 +11,7 @@ import {
   skinToneById,
   type SkinToneId,
 } from "@/domain/avatarTone";
+import { useTranslation } from "@/i18n/useTranslation";
 import styles from "./EmojiPicker.module.css";
 
 interface AvatarPickerProps {
@@ -55,6 +56,7 @@ function OtherAvatarGrid({
 }
 
 export function AvatarPicker({ value, onChange }: AvatarPickerProps) {
+  const { t } = useTranslation();
   const parsed = parseAvatar(value || null);
   const [skinToneId, setSkinToneId] = useState<SkinToneId>(parsed.skinToneId);
   const [humanBaseId, setHumanBaseId] = useState<string | null>(parsed.humanBaseId);
@@ -94,7 +96,7 @@ export function AvatarPicker({ value, onChange }: AvatarPickerProps) {
   return (
     <div className="avatar-picker">
       <div className="form-field" style={{ marginBottom: 12 }}>
-        <span id="avatar-skin-label">Skin tone</span>
+        <span id="avatar-skin-label">{t("avatar.skinTone")}</span>
         <div
           className="skin-tone-swatches"
           role="radiogroup"
@@ -116,12 +118,12 @@ export function AvatarPicker({ value, onChange }: AvatarPickerProps) {
       </div>
 
       <div className="form-field" style={{ marginBottom: 12 }}>
-        <span id="avatar-style-label">Style</span>
+        <span id="avatar-style-label">{t("avatar.style")}</span>
         <div
           className={`${styles.grid} picker-grid`}
           role="listbox"
           aria-labelledby="avatar-style-label"
-          aria-label="Choose an avatar"
+          aria-label={t("avatar.choose")}
         >
           {HUMAN_AVATAR_BASES.map(({ id, base, label }) => {
             const rendered = applySkinTone(base, toneModifier);
@@ -145,7 +147,7 @@ export function AvatarPicker({ value, onChange }: AvatarPickerProps) {
 
       <OtherAvatarGrid
         labelId="avatar-pets-label"
-        label="Pets"
+        label={t("avatar.pets")}
         options={PET_AVATARS}
         otherId={otherId}
         onSelect={selectOther}
@@ -153,7 +155,7 @@ export function AvatarPicker({ value, onChange }: AvatarPickerProps) {
 
       <OtherAvatarGrid
         labelId="avatar-robots-label"
-        label="Robots"
+        label={t("avatar.robots")}
         options={ROBOT_AVATARS}
         otherId={otherId}
         onSelect={selectOther}

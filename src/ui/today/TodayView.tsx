@@ -1,12 +1,13 @@
 import { format } from "date-fns";
 import { useCallback, useMemo, useState } from "react";
 import { useHousehold } from "@/hooks/HouseholdProvider";
+import { formatTodayHeading } from "@/i18n/formatDate";
+import { useTranslation } from "@/i18n/useTranslation";
 import { getPoolTasksForToday, getRotationTasksForMemberOnDate } from "@/domain/queries";
 import {
   getMostActiveMemberIds,
   weekCompletionCount,
   allTimePoints,
-  formatPointsBadge,
 } from "@/domain/points";
 import {
   completeRotationTask,
@@ -14,7 +15,7 @@ import {
   isTaskCompletedOnDate,
   completePoolTask,
 } from "@/domain/completions";
-import { getActiveRewards, formatRewardRow } from "@/domain/rewards";
+import { getActiveRewards } from "@/domain/rewards";
 import { TaskCard } from "@/ui/components/TaskCard";
 import { MemberPicker } from "@/ui/components/MemberPicker";
 import { MemberBadge } from "@/ui/components/MemberBadge";
@@ -25,12 +26,9 @@ function todayString(): string {
   return format(new Date(), "yyyy-MM-dd");
 }
 
-function todayHeading(): string {
-  return format(new Date(), "EEEE, MMM d");
-}
-
 export function TodayView() {
   const { household, loading, dispatch } = useHousehold();
+  const { t, locale } = useTranslation();
   const [poolTask, setPoolTask] = useState<Task | null>(null);
   const [pointsFlash, setPointsFlash] = useState<number | null>(null);
   const [rewardsOpen, setRewardsOpen] = useState(false);
@@ -48,7 +46,7 @@ export function TodayView() {
   const clearPointsFlash = useCallback(() => setPointsFlash(null), []);
 
   if (loading) {
-    return <p className="empty-state">Loading…</p>;
+    return <p className="empty-state">{t("common.loading")}</p>;
   }
 
   const selectedMember = members.find((m) => m.id === activeMemberId);
@@ -58,12 +56,12 @@ export function TodayView() {
 
   return (
     <div>
-      <h1 className="page-title">{todayHeading()}</h1>
+      <h1 className="page-title">{formatTodayHeading(locale)}</h1>
 
       <section className="anyone-section">
-        <h2 className="section-title">Anyone</h2>
+        <h2 className="section-title">{t("today.anyone")}</h2>
         {poolTasks.length === 0 ? (
-          <p className="empty-state">Nothing scheduled today</p>
+          <p className="empty-state">{t("today.nothingScheduled")}</p>
         ) : (
           poolTasks.map((task) => (
             <TaskCard
@@ -94,7 +92,7 @@ export function TodayView() {
             >
               <MemberBadge member={member} />
               <span className="points-badge">
-                {formatPointsBadge(allTimePoints(household, member.id))}
+                {allTimePoints(household, member.id)} {t("common.pts")}
               </span>
             </button>
           ))}
@@ -107,7 +105,7 @@ export function TodayView() {
           style={{ borderTop: `4px solid ${selectedMember.color}` }}
         >
           {rotationTasks.length === 0 ? (
-            <p className="empty-state">Nothing scheduled today</p>
+            <p className="empty-state">{t("today.nothingScheduled")}</p>
           ) : (
             rotationTasks.map((task) => {
               const checked = isTaskCompletedOnDate(household, task.id, date);
@@ -143,12 +141,14 @@ export function TodayView() {
       {activeRewards.length > 0 && (
         <section className="rewards-section">
           <button type="button" className="rewards-toggle" onClick={() => setRewardsOpen((v) => !v)}>
-            Rewards
+            {t("today.rewards")}
           </button>
           {rewardsOpen && (
             <ul className="rewards-list">
               {activeRewards.map((reward) => (
-                <li key={reward.id}>{formatRewardRow(reward)}</li>
+                <li key={reward.id}>
+                  {t("rewards.row", { title: reward.title, cost: reward.cost })}
+                </li>
               ))}
             </ul>
           )}
@@ -168,7 +168,7 @@ export function TodayView() {
           const member = members.find((m) => m.id === id);
           return member ? (
             <span key={`star-${id}`} className="most-active-label">
-              ★ {member.name} most active
+              ★ {t("today.mostActive", { name: member.name })}
             </span>
           ) : null;
         })}

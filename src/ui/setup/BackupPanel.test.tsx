@@ -7,7 +7,7 @@ import { createInMemoryStore } from "@/store/inMemoryStore";
 import { createEmptyHousehold } from "@/domain/seed";
 import { addMember } from "@/domain/members";
 import { addTask } from "@/domain/tasks";
-import { IMPORT_CONFIRM_MESSAGE } from "@/store/store";
+import { translate } from "@/i18n/messages";
 import { serializeHousehold } from "@/store/exportImport";
 
 const NOW = new Date("2026-09-02T10:00:00.000Z");
@@ -64,8 +64,12 @@ describe("BackupPanel", () => {
     });
     await user.upload(input, file);
 
-    expect(await screen.findByText(/This backup has 2 members and 1 task/)).toBeTruthy();
-    expect(screen.getByText(IMPORT_CONFIRM_MESSAGE)).toBeTruthy();
+    expect(
+      await screen.findByText(
+        translate("en", "backup.previewCounts", { members: 2, tasks: 1 }),
+      ),
+    ).toBeTruthy();
+    expect(screen.getByText(translate("en", "backup.importConfirm"))).toBeTruthy();
   });
 
   it("imports after confirm", async () => {

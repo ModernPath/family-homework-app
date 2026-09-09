@@ -1,5 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import type { ReactNode } from "react";
+import { useTranslation } from "@/i18n/useTranslation";
+import { LanguageSwitcher } from "@/ui/components/LanguageSwitcher";
 
 interface AppShellProps {
   children: ReactNode;
@@ -7,17 +9,20 @@ interface AppShellProps {
 
 export function AppShell({ children }: AppShellProps) {
   const { pathname } = useLocation();
+  const { t } = useTranslation();
   const mainClass =
     pathname.startsWith("/setup") ? "app-main app-main--setup" : "app-main";
 
   return (
     <div className="app-shell">
-      <nav className="app-nav" aria-label="Main">
+      <nav className="app-nav" aria-label={t("nav.main")}>
         <NavLink to="/" end>
-          Today
+          {t("nav.today")}
         </NavLink>
-        <NavLink to="/week">Week</NavLink>
-        <NavLink to="/setup">Setup</NavLink>
+        <NavLink to="/week">{t("nav.week")}</NavLink>
+        <NavLink to="/coach">{t("nav.coach")}</NavLink>
+        <NavLink to="/setup">{t("nav.setup")}</NavLink>
+        <LanguageSwitcher />
       </nav>
       <main className={mainClass}>{children}</main>
     </div>

@@ -6,7 +6,7 @@ The kitchen tablet needs a installable, offline-capable shell: consistent naviga
 
 ## Proposed Change
 
-Single-page app with `AppShell` wrapping all routes. Web app manifest: `name: "Family Task Board"`, `short_name: "Tasks"`, `display: "standalone"`, `start_url: "/"`. Service worker caches static assets (HTML, JS, CSS) on install; cache-first for static, network-not-required for app logic (data is local store). Document `lang="en"`. Primary nav visible on Today, Week, Setup with links `Today`, `Week`, `Setup` — current route link has `aria-current="page"`. No telemetry scripts loaded.
+Single-page app with `AppShell` wrapping all routes. Web app manifest: `name: "Family Task Board"`, `short_name: "Tasks"`, `display: "standalone"`, `start_url: "/"`. Service worker caches static assets (HTML, JS, CSS) on install; cache-first for static, network-not-required for app logic (data is local store). Document `lang="en"`. Primary nav visible on Today, Week, Coach, and Setup with links `Today`, `Week`, `Coach`, `Setup` — current route link has `aria-current="page"`. No telemetry scripts loaded.
 
 ## Acceptance Criteria
 
@@ -33,7 +33,7 @@ Single-page app with `AppShell` wrapping all routes. Web app manifest: `name: "F
 ### AC5: Document language
 **Given** any page  
 **When** inspecting `<html>`  
-**Then** `lang` attribute is exactly `en`
+**Then** `lang` attribute equals the active household locale (`en` or `fi`)
 
 ### AC6: No external telemetry
 **Given** production build  
@@ -63,7 +63,7 @@ Single-page app with `AppShell` wrapping all routes. Web app manifest: `name: "F
 | service worker | offline | SW installed, offline | GET / | shell renders, date visible |
 | AppShell | aria-current | route /week | render | Week link aria-current page |
 | AppShell | no auth | any route | render | no password/login form |
-| index.html | lang | load page | inspect html | lang=en |
+| index.html | lang | load page with locale fi | inspect html | lang=fi |
 | network | no telemetry | navigate views | capture requests | no third-party domains |
 
 ## Spec Readiness checklist (run before calling the spec done)

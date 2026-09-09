@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useHousehold } from "@/hooks/HouseholdProvider";
-import { addTask, deactivateTask, formatDeactivateTaskMessage, updateTask } from "@/domain/tasks";
+import { useTranslation } from "@/i18n/useTranslation";
+import { getWeekdayOptions } from "@/i18n/weekdays";
+import { addTask, deactivateTask, updateTask } from "@/domain/tasks";
 import type { Task } from "@/domain/types";
 import { EmojiPicker } from "@/ui/components/EmojiPicker";
 import { ConfirmDialog } from "@/ui/components/ConfirmDialog";
-import { WEEKDAY_OPTIONS } from "@/ui/constants";
 import {
   buildAssignmentFromForm,
   buildScheduleFromForm,
@@ -14,8 +15,17 @@ import {
   type TaskFormState,
 } from "@/ui/setup/taskFormState";
 
+const SCHEDULE_PRESETS: { preset: SchedulePreset; key: "tasks.schedule.daily" | "tasks.schedule.weekdays" | "tasks.schedule.weekly" | "tasks.schedule.once" }[] = [
+  { preset: "daily", key: "tasks.schedule.daily" },
+  { preset: "weekdays", key: "tasks.schedule.weekdays" },
+  { preset: "weekly", key: "tasks.schedule.weekly" },
+  { preset: "once", key: "tasks.schedule.once" },
+];
+
 export function TasksPanel() {
   const { household, dispatch } = useHousehold();
+  const { t, te, locale } = useTranslation();
+  const weekdayOptions = getWeekdayOptions(locale);
   const [form, setForm] = useState<TaskFormState>(DEFAULT_TASK_FORM);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deactivateTargetId, setDeactivateTargetId] = useState<string | null>(null);
@@ -52,24 +62,27 @@ export function TasksPanel() {
       <section className="setup-panel__list">
         <ul className="item-list">
         {household.tasks
-          .filter((t) => t.active)
+          .filter((task) => task.active)
           .map((task) => (
             <li key={task.id} className="item-card">
               <span className="item-card__avatar">{task.icon}</span>
               <div className="item-card__body">
                 <p className="item-card__title">{task.title}</p>
                 <p className="item-card__meta">
-                  {task.assignment.type === "rotation" ? "Rotation" : "Pool"} · {task.points} pts
+                  {task.assignment.type === "rotation"
+                    ? t("tasks.rotation")
+                    : t("tasks.pool")}{" "}
+                  · {task.points} {t("common.pts")}
                 </p>
               </div>
               <div className="item-card__actions">
                 <button
                   type="button"
                   className="btn btn-ghost"
-                  aria-label={`Edit ${task.title}`}
+                  aria-label={`${t("common.edit")} ${task.title}`}
                   onClick={() => startEdit(task)}
                 >
-                  Edit
+                  {t("common.edit")}
                 </button>
                 <button
                   type="button"
@@ -79,7 +92,7 @@ export function TasksPanel() {
                     setError(null);
                   }}
                 >
-                  Deactivate
+                  {t("common.deactivate")}
                 </button>
               </div>
             </li>
@@ -107,43 +120,41 @@ export function TasksPanel() {
               resetForm();
               setError(null);
             } else {
-              setError(result.error);
+              setError(te(result.error));
             }
             return result;
           });
         }}
       >
-        <h2 className="section-title">{editingId ? "Edit task" : "Add task"}</h2>
+        <h2 className="section-title">{editingId ? t("tasks.edit") : t("tasks.add")}</h2>
 
         <div className="form-field">
-          <label htmlFor="task-title">Title</label>
+          <label htmlFor="task-title">{t("tasks.title")}</label>
           <input
             id="task-title"
             value={form.title}
             onChange={(e) => updateForm({ title: e.target.value })}
-            aria-label="Title"
+            aria-label={t("tasks.title")}
           />
         </div>
 
         <div className="form-field">
-          <span>Icon</span>
+          <span>{t("tasks.icon")}</span>
           <EmojiPicker value={form.icon} onChange={(icon) => updateForm({ icon })} />
         </div>
 
         <fieldset>
-          <legend>Schedule</legend>
+          <legend>{t("tasks.schedule")}</legend>
           <div className="radio-group">
-            {(["Daily", "Weekdays", "Weekly", "Once"] as const).map((label) => (
-              <label key={label}>
+            {SCHEDULE_PRESETS.map(({ preset, key }) => (
+              <label key={preset}>
                 <input
                   type="radio"
                   name="schedule"
-                  checked={form.preset === label.toLowerCase()}
-                  onChange={() =>
-                    updateForm({ preset: label.toLowerCase() as SchedulePreset })
-                  }
+                  checked={form.preset === preset}
+                  onChange={() => updateForm({ preset })}
                 />
-                {label}
+                {t(key)}
               </label>
             ))}
           </div>
@@ -151,9 +162,9 @@ export function TasksPanel() {
 
         {form.preset === "weekdays" && (
           <fieldset>
-            <legend>On these days</legend>
+            <legend>{t("tasks.onTheseDays")}</legend>
             <div className="checkbox-group">
-              {WEEKDAY_OPTIONS.map(({ value, label }) => (
+              {weekdayOptions.map(({ value, label }) => (
                 <label key={value}>
                   <input
                     type="checkbox"
@@ -169,14 +180,14 @@ export function TasksPanel() {
 
         {form.preset === "weekly" && (
           <div className="form-field">
-            <label htmlFor="weekly-day">Day of week</label>
+            <label htmlFor="weekly-day">{t("tasks.dayOfWeek")}</label>
             <select
               id="weekly-day"
               value={form.weeklyDay}
               onChange={(e) => updateForm({ weeklyDay: Number(e.target.value) })}
-              aria-label="Day of week"
+              aria-label={t("tasks.dayOfWeek")}
             >
-              {WEEKDAY_OPTIONS.map(({ value, label }) => (
+              {weekdayOptions.map(({ value, label }) => (
                 <option key={value} value={value}>
                   {label}
                 </option>
@@ -187,7 +198,7 @@ export function TasksPanel() {
 
         {form.preset === "once" && (
           <div className="form-field">
-            <label htmlFor="once-date">Date</label>
+            <label htmlFor="once-date">{t("tasks.date")}</label>
             <input
               id="once-date"
               type="date"
@@ -198,7 +209,7 @@ export function TasksPanel() {
         )}
 
         <fieldset>
-          <legend>Assignment</legend>
+          <legend>{t("tasks.assignment")}</legend>
           <div className="radio-group">
             <label>
               <input
@@ -207,7 +218,7 @@ export function TasksPanel() {
                 checked={form.assignmentType === "rotation"}
                 onChange={() => updateForm({ assignmentType: "rotation" })}
               />
-              Rotation
+              {t("tasks.rotation")}
             </label>
             <label>
               <input
@@ -218,14 +229,14 @@ export function TasksPanel() {
                   updateForm({ assignmentType: "pool", rotationMemberIds: [] })
                 }
               />
-              Pool
+              {t("tasks.pool")}
             </label>
           </div>
         </fieldset>
 
         {form.assignmentType === "rotation" && (
           <fieldset>
-            <legend>Rotation order</legend>
+            <legend>{t("tasks.rotationOrder")}</legend>
             <div className="checkbox-group">
               {household.members.map((member) => (
                 <label key={member.id}>
@@ -249,7 +260,7 @@ export function TasksPanel() {
         )}
 
         <div className="form-field">
-          <label htmlFor="task-points">Points</label>
+          <label htmlFor="task-points">{t("tasks.points")}</label>
           <input
             id="task-points"
             type="number"
@@ -262,11 +273,11 @@ export function TasksPanel() {
 
         <div className="form-actions">
           <button type="submit" className="btn btn-primary">
-            {editingId ? "Update" : "Save"}
+            {editingId ? t("common.update") : t("common.save")}
           </button>
           {editingId && (
             <button type="button" className="btn btn-secondary" onClick={resetForm}>
-              Cancel
+              {t("common.cancel")}
             </button>
           )}
         </div>
@@ -277,12 +288,12 @@ export function TasksPanel() {
 
       {deactivateTarget && (
         <ConfirmDialog
-          message={formatDeactivateTaskMessage(deactivateTarget.title)}
+          message={t("tasks.deactivateConfirm", { title: deactivateTarget.title })}
           onCancel={() => setDeactivateTargetId(null)}
           onConfirm={() => {
             void dispatch((h) => {
               const result = deactivateTask(h, deactivateTarget.id);
-              if (!result.ok) setError(result.error);
+              if (!result.ok) setError(te(result.error));
               else if (editingId === deactivateTarget.id) resetForm();
               setDeactivateTargetId(null);
               return result;

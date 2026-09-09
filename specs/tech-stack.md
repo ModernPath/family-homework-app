@@ -16,7 +16,7 @@
 | Routing | **React Router 6** | Three routes, no overhead |
 | Styling | **CSS Modules + CSS variables** | No Tailwind build step; scoped styles, design tokens in `:root` |
 | Dates | **date-fns 3** | Tree-shakeable, `format` / `eachDayOfInterval` / ISO week |
-| Persistence | **idb 8** | Thin IndexedDB wrapper (~1KB), Promise API |
+| Persistence | **sql.js 1.14** (SQLite WASM) + OPFS file `family-task-board.sqlite` | Real SQLite engine; IndexedDB kept only for one-time migrate |
 | PWA | **vite-plugin-pwa** | Service worker + manifest generation |
 | Tests | **Vitest 2** | Same config as Vite, fast domain tests |
 | IDB in tests | **fake-indexeddb** | Node test env for store tests |
@@ -31,7 +31,7 @@
 | Redux / Zustand | Single `Household` document + one hook sufficient |
 | Dexie | ORM features unused for one-key storage |
 | Backend (Node/Bun) | v1 is client-only local-first |
-| SQLite (sql.js) | JSON document simpler for export/import |
+| SQLite (sql.js) | ~~Rejected~~ **Adopted** — production store; JSON document still lives inside one SQLite row for export/import simplicity |
 | Workbox manual | vite-plugin-pwa covers MVP cache needs |
 
 ---
@@ -42,7 +42,7 @@
 |-------------|---------|
 | Browser | Chromium 100+ (Android tablet Chrome), Safari 15.4+ (iPad) |
 | JavaScript | ES2022 |
-| Storage | IndexedDB available (~5MB+ quota) |
+| Storage | OPFS (`family-task-board.sqlite`); IndexedDB only as migrate source |
 | Display | 600×800 px viewport minimum |
 | Network | Required once for initial load; offline after SW install |
 

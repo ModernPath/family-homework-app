@@ -66,9 +66,11 @@ export interface Redemption {
   createdAt: string;
 }
 
+export type AppLocale = "en" | "fi";
+
 export interface HouseholdSettings {
   weekStartsOn: 1;
-  locale: "en";
+  locale: AppLocale;
 }
 
 export interface HouseholdMeta {

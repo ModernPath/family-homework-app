@@ -1,4 +1,5 @@
 import type { Household } from "@/domain/types";
+import { normalizeLocale } from "@/i18n/messages";
 import { BACKUP_FILENAME } from "./store";
 
 const REQUIRED_KEYS = [
@@ -46,7 +47,17 @@ export function parseBackup(json: string): { ok: true; value: Household } | { ok
     return { ok: false, error: "Invalid backup file" };
   }
 
-  return { ok: true, value: parsed };
+  const household = parsed as Household;
+  return {
+    ok: true,
+    value: {
+      ...household,
+      settings: {
+        ...household.settings,
+        locale: normalizeLocale(household.settings?.locale),
+      },
+    },
+  };
 }
 
 export function exportFilename(): string {

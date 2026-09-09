@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useHousehold } from "@/hooks/HouseholdProvider";
-import { addMember, formatDeleteMemberMessage, removeMember, updateMember } from "@/domain/members";
+import { useTranslation } from "@/i18n/useTranslation";
+import { addMember, removeMember, updateMember } from "@/domain/members";
 import { MEMBER_COLOR_PALETTE } from "@/domain/types";
 import { AvatarPicker } from "@/ui/components/AvatarPicker";
 import { ColorSwatches } from "@/ui/components/ColorSwatches";
@@ -9,6 +10,7 @@ import { MemberBadge } from "@/ui/components/MemberBadge";
 
 export function MembersPanel() {
   const { household, dispatch } = useHousehold();
+  const { t, te } = useTranslation();
   const [name, setName] = useState("");
   const [color, setColor] = useState<string>(MEMBER_COLOR_PALETTE[0]);
   const [avatar, setAvatar] = useState<string | null>(null);
@@ -38,7 +40,7 @@ export function MembersPanel() {
   return (
     <div className="setup-panel setup-panel--split">
       <section className="setup-panel__list">
-        <ul className="item-list" aria-label="Members">
+        <ul className="item-list" aria-label={t("members.listLabel")}>
           {household.members.map((member) => (
             <li key={member.id} className="item-card">
               <MemberBadge member={member} visual="list" showName={false} />
@@ -49,21 +51,21 @@ export function MembersPanel() {
                 <button
                   type="button"
                   className="btn btn-ghost"
-                  aria-label={`Edit ${member.name}`}
+                  aria-label={`${t("common.edit")} ${member.name}`}
                   onClick={() => startEdit(member.id)}
                 >
-                  Edit
+                  {t("common.edit")}
                 </button>
                 <button
                   type="button"
                   className="btn btn-danger-ghost"
-                  aria-label={`Delete ${member.name}`}
+                  aria-label={`${t("common.delete")} ${member.name}`}
                   onClick={() => {
                     setDeleteTargetId(member.id);
                     setError(null);
                   }}
                 >
-                  Delete
+                  {t("common.delete")}
                 </button>
               </div>
             </li>
@@ -84,46 +86,48 @@ export function MembersPanel() {
                 resetForm();
                 setError(null);
               } else {
-                setError(result.error);
+                setError(te(result.error));
               }
               return result;
             });
           }}
         >
-          <h2 className="section-title">{editingId ? "Edit member" : "Add member"}</h2>
+          <h2 className="section-title">
+            {editingId ? t("members.edit") : t("members.add")}
+          </h2>
 
           <div className="form-field">
-            <label htmlFor="member-name">Name</label>
+            <label htmlFor="member-name">{t("members.name")}</label>
             <input
               id="member-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              aria-label="Name"
+              aria-label={t("members.name")}
             />
           </div>
 
           <div className="form-field">
-            <span>Color</span>
+            <span>{t("members.color")}</span>
             <ColorSwatches value={color} onChange={setColor} />
           </div>
 
           <div className="form-field">
-            <span>Avatar</span>
+            <span>{t("members.avatar")}</span>
             <AvatarPicker value={avatar ?? ""} onChange={(emoji) => setAvatar(emoji)} />
             {avatar && (
               <button type="button" className="btn btn-ghost" onClick={() => setAvatar(null)}>
-                Clear avatar
+                {t("members.clearAvatar")}
               </button>
             )}
           </div>
 
           <div className="form-actions">
             <button type="submit" className="btn btn-primary">
-              {editingId ? "Update" : "Save"}
+              {editingId ? t("common.update") : t("common.save")}
             </button>
             {editingId && (
               <button type="button" className="btn btn-secondary" onClick={resetForm}>
-                Cancel
+                {t("common.cancel")}
               </button>
             )}
           </div>
@@ -134,12 +138,12 @@ export function MembersPanel() {
 
       {deleteTarget && (
         <ConfirmDialog
-          message={formatDeleteMemberMessage(deleteTarget.name)}
+          message={t("members.deleteConfirm", { name: deleteTarget.name })}
           onCancel={() => setDeleteTargetId(null)}
           onConfirm={() => {
             void dispatch((h) => {
               const result = removeMember(h, deleteTarget.id);
-              if (!result.ok) setError(result.error);
+              if (!result.ok) setError(te(result.error));
               else {
                 setError(null);
                 if (editingId === deleteTarget.id) resetForm();

@@ -6,7 +6,7 @@ All household data must survive browser restarts on the kitchen tablet, support 
 
 ## Proposed Change
 
-Define `Store` interface: `load(): Promise<Household>`, `save(household: Household): Promise<void>`, `subscribe(listener): Unsubscribe`. v1 implementation `IndexedDbStore` persists one document keyed `household` in database `family-task-board`. Every entity includes `createdAt`/`updatedAt` ISO-8601 UTC on write. `Household.meta` includes `schemaVersion: 1` and `lastModified` updated on each save. Export: serialize full household to JSON file download named exactly `family-task-board-backup.json`. Import: file picker accepts `.json` only; preview shows member count and task count; confirm dialog text exactly `Replace all data? This cannot be undone.`; on confirm replace store contents and reload UI. Empty first launch seeds `{ members: [], tasks: [], completions: [], rewards: [], redemptions: [], overrides: [], settings: { weekStartsOn: 1, locale: "en" }, meta: { schemaVersion: 1 } }`.
+Define `Store` interface: `load(): Promise<Household>`, `save(household: Household): Promise<void>`, `subscribe(listener): Unsubscribe`. v1 implementation `SqliteStore` (sql.js) persists the household JSON in SQLite table `household` row `id = 'default'`, file `family-task-board.sqlite` in OPFS. First SQLite load copies any existing IndexedDB `family-task-board` document. Every entity includes `createdAt`/`updatedAt` ISO-8601 UTC on write. `Household.meta` includes `schemaVersion: 1` and `lastModified` updated on each save. Export: serialize full household to JSON file download named exactly `family-task-board-backup.json`. Import: file picker accepts `.json` only; preview shows member count and task count; confirm dialog text exactly `Replace all data? This cannot be undone.`; on confirm replace store contents and reload UI. Empty first launch seeds `{ members: [], tasks: [], completions: [], rewards: [], redemptions: [], overrides: [], settings: { weekStartsOn: 1, locale: <detected en|fi> }, meta: { schemaVersion: 1 } }` where `locale` is `fi` when `navigator.languages` prefers Finnish, otherwise `en`.
 
 **Assumption (OD-7):** Manual export/import only in v1; no automatic LAN backup.
 
@@ -49,7 +49,7 @@ Define `Store` interface: `load(): Promise<Household>`, `save(household: Househo
 
 ### AC8: Store interface swappable
 **Given** `InMemoryStore` implementing `Store`  
-**When** app bootstrap receives `InMemoryStore` instead of `IndexedDbStore`  
+**When** app bootstrap receives `InMemoryStore` instead of `SqliteStore`  
 **Then** all Setup and Today flows operate without importing IndexedDB module in domain layer
 
 ## Files to Modify
@@ -57,7 +57,8 @@ Define `Store` interface: `load(): Promise<Household>`, `save(household: Househo
 | File | Change |
 |---|---|
 | `src/store/store.ts` | `Store` interface, `Household` type |
-| `src/store/indexedDbStore.ts` | v1 persistence |
+| `src/store/sqliteStore.ts` | v1 persistence (sql.js + OPFS) |
+| `src/store/indexedDbStore.ts` | One-time migrate reader |
 | `src/store/inMemoryStore.ts` | Test double |
 | `src/store/exportImport.ts` | JSON serialize, validate `schemaVersion` |
 | `src/ui/setup/BackupPanel.tsx` | Export/import UI |
@@ -65,14 +66,14 @@ Define `Store` interface: `load(): Promise<Household>`, `save(household: Househo
 
 ## Risk
 
-- What could break: IndexedDB quota or private mode blocks storage.
-- Rollback: fall back to `InMemoryStore` with session-only data and visible warning `Data will not persist`.
+- What could break: OPFS unavailable in private mode; WASM blocked by stale service worker.
+- Rollback: point `createDefaultStore` at `createIndexedDbStore`.
 
 ## Testing Strategy (MANDATORY)
 
 | Function | Case | Given | When | Then |
 |---|---|---|---|---|
-| `IndexedDbStore.save/load` | round trip | 2 members 3 tasks | save, load | equal counts and ids |
+| `SqliteStore.save/load` | round trip | 2 members 3 tasks | save, load | equal counts and ids |
 | `save` | updatedAt | member T0 | update name | updatedAt > T0 |
 | `exportHousehold` | filename | any household | export | filename `family-task-board-backup.json` |
 | `exportHousehold` | keys | any household | parse file | all required top-level keys |

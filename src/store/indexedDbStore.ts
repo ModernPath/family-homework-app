@@ -7,6 +7,25 @@ const DB_NAME = "family-task-board";
 const STORE = "household";
 const KEY = "default";
 
+export async function peekIndexedDbHousehold(): Promise<Household | null> {
+  if (typeof indexedDB === "undefined") {
+    return null;
+  }
+  try {
+    const db = await openDB(DB_NAME, 1, {
+      upgrade(database) {
+        if (!database.objectStoreNames.contains(STORE)) {
+          database.createObjectStore(STORE);
+        }
+      },
+    });
+    const value = await db.get(STORE, KEY);
+    return (value as Household | undefined) ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export function createIndexedDbStore(): Store {
   const dbPromise = openDB(DB_NAME, 1, {
     upgrade(db) {

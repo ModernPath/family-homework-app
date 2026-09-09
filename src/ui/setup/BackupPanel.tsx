@@ -1,18 +1,19 @@
 import { useRef, useState } from "react";
 import { useHousehold } from "@/hooks/HouseholdProvider";
+import { useTranslation } from "@/i18n/useTranslation";
 import {
   exportFilename,
   getBackupPreview,
   parseBackup,
   serializeHousehold,
 } from "@/store/exportImport";
-import { IMPORT_CONFIRM_MESSAGE } from "@/store/store";
 import type { Household } from "@/domain/types";
 import { ConfirmDialog } from "@/ui/components/ConfirmDialog";
 import { createVuorioHousehold } from "@/domain/demoHousehold";
 
 export function BackupPanel() {
   const { household, dispatch } = useHousehold();
+  const { t, te } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingImport, setPendingImport] = useState<Household | null>(null);
   const [pendingSample, setPendingSample] = useState(false);
@@ -25,9 +26,9 @@ export function BackupPanel() {
 
   return (
     <div className="setup-panel">
-      <p className="subsection-label">Data backup</p>
+      <p className="subsection-label">{t("backup.title")}</p>
       <p style={{ color: "var(--text-muted)", marginBottom: 20 }}>
-        Export your household data to a file, or restore from a previous backup.
+        {t("backup.description")}
       </p>
 
       <div className="backup-actions">
@@ -44,10 +45,10 @@ export function BackupPanel() {
             anchor.download = exportFilename();
             anchor.click();
             URL.revokeObjectURL(url);
-            setMessage("Backup downloaded");
+            setMessage(t("backup.downloaded"));
           }}
         >
-          Export backup
+          {t("backup.export")}
         </button>
 
         <input
@@ -63,7 +64,7 @@ export function BackupPanel() {
               const text = String(reader.result);
               const parsed = parseBackup(text);
               if (!parsed.ok) {
-                setError(parsed.error);
+                setError(te(parsed.error));
                 return;
               }
               setPendingImport(parsed.value);
@@ -79,7 +80,7 @@ export function BackupPanel() {
           className="btn btn-secondary"
           onClick={() => fileInputRef.current?.click()}
         >
-          Import backup
+          {t("backup.import")}
         </button>
 
         <button
@@ -90,7 +91,7 @@ export function BackupPanel() {
             setError(null);
           }}
         >
-          Load Vuorio family sample
+          {t("backup.loadSample")}
         </button>
       </div>
 
@@ -98,17 +99,18 @@ export function BackupPanel() {
         <ConfirmDialog
           preview={
             <p className="dialog-preview">
-              This backup has {preview.memberCount} member
-              {preview.memberCount === 1 ? "" : "s"} and {preview.taskCount} task
-              {preview.taskCount === 1 ? "" : "s"}.
+              {t("backup.previewCounts", {
+                members: preview.memberCount,
+                tasks: preview.taskCount,
+              })}
             </p>
           }
-          message={IMPORT_CONFIRM_MESSAGE}
+          message={t("backup.importConfirm")}
           onCancel={() => setPendingImport(null)}
           onConfirm={() => {
             void dispatch(() => ({ ok: true, value: pendingImport }));
             setPendingImport(null);
-            setMessage("Import complete");
+            setMessage(t("backup.importComplete"));
           }}
         />
       )}
@@ -118,21 +120,22 @@ export function BackupPanel() {
           preview={
             <>
               <p className="dialog-preview">
-                Loads Pasi, Minna, Sini, Saara, Miska with {samplePreview.taskCount}{" "}
-                chores and sample rewards.
+                {t("backup.samplePreview", { tasks: samplePreview.taskCount })}
               </p>
               <p className="dialog-preview">
-                This backup has {samplePreview.memberCount} members and{" "}
-                {samplePreview.taskCount} tasks.
+                {t("backup.previewCounts", {
+                  members: samplePreview.memberCount,
+                  tasks: samplePreview.taskCount,
+                })}
               </p>
             </>
           }
-          message={IMPORT_CONFIRM_MESSAGE}
+          message={t("backup.importConfirm")}
           onCancel={() => setPendingSample(false)}
           onConfirm={() => {
             void dispatch(() => ({ ok: true, value: sampleHousehold }));
             setPendingSample(false);
-            setMessage("Vuorio family sample loaded");
+            setMessage(t("backup.sampleLoaded"));
           }}
         />
       )}

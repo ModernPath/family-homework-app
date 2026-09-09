@@ -1,6 +1,8 @@
 import { addDays, format } from "date-fns";
 import { useMemo, useState } from "react";
 import { useHousehold } from "@/hooks/HouseholdProvider";
+import { formatWeekColumn } from "@/i18n/formatDate";
+import { useTranslation } from "@/i18n/useTranslation";
 import { getRotationAssignee } from "@/domain/rotation";
 import { occursOnDate } from "@/domain/occurrences";
 import {
@@ -19,6 +21,7 @@ interface OverrideTarget {
 
 export function WeekView() {
   const { household, loading, dispatch } = useHousehold();
+  const { t, locale } = useTranslation();
   const [overrideTarget, setOverrideTarget] = useState<OverrideTarget | null>(null);
   const startDate = format(new Date(), "yyyy-MM-dd");
   const dates = useMemo(
@@ -31,19 +34,19 @@ export function WeekView() {
   const poolTasks = getPoolTasksForWeek(household, dateRange);
 
   if (loading) {
-    return <p className="empty-state">Loading…</p>;
+    return <p className="empty-state">{t("common.loading")}</p>;
   }
 
   return (
     <div>
-      <h1 className="page-title">This week</h1>
+      <h1 className="page-title">{t("week.title")}</h1>
       <div className="week-grid-wrapper">
         <table className="week-grid">
           <thead>
             <tr>
-              <th>Task</th>
+              <th>{t("week.task")}</th>
               {dates.map((dateStr) => (
-                <th key={dateStr}>{format(new Date(`${dateStr}T12:00:00`), "EEE M/d")}</th>
+                <th key={dateStr}>{formatWeekColumn(locale, dateStr)}</th>
               ))}
             </tr>
           </thead>
@@ -85,13 +88,13 @@ export function WeekView() {
         </table>
       </div>
 
-      <h2 className="section-title">Open tasks</h2>
+      <h2 className="section-title">{t("week.openTasks")}</h2>
       <ul className="open-tasks-list">
         {poolTasks.map((task) => (
           <li key={task.id}>
             <span>{task.icon}</span>
             <span>{task.title}</span>
-            <span className="pool-badge">Anyone</span>
+            <span className="pool-badge">{t("week.anyone")}</span>
           </li>
         ))}
       </ul>
