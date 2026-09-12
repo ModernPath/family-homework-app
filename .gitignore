@@ -8,6 +8,11 @@ dev-dist/
 .DS_Store
 *.local
 coverage/
+.vercel/
+.venv-hosting/
+**/__pycache__/
+.pytest_cache/
+artifacts/
 .vite/
 *.log
 scripts/*.png

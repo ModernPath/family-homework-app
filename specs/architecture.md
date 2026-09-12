@@ -1,5 +1,9 @@
 # Architecture Specification
 
+Hosting supplement: [Docker and Vercel](../docs/hosting.md) and
+[hosting subsystem](../docs/subsystems/hosting/README.md) describe the stateless
+hosted coach adapter. The local browser store below remains unchanged.
+
 **Status:** Draft  
 **Last updated:** 2026-09-02  
 **Scope:** v1 MVP — single tablet, local-first, sync-ready boundaries

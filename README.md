@@ -33,6 +33,21 @@ npm run build
 
 Load sample data: **Setup → Backup → Load Vuorio family sample**.
 
+## Week 3: ready-made hosting examples
+
+**[Docker and Vercel walkthrough (Finnish)](docs/hosting.md)** — includes the
+working Coach API, AI prompts, verification, troubleshooting and storage limits.
+
+```bash
+docker compose up --build -d
+# Open http://localhost:8080
+```
+
+For Vercel, import this repository with the **Vite** preset; `vercel.json`
+configures the frontend and Python function. Neither example needs an API key.
+These are synthetic-data demos: household data remains browser-local, the hosted
+coach is stateless, and accounts/cloud sync are not implemented by hosting.
+
 ## Course context
 
 Built as a hands-on example for learning:

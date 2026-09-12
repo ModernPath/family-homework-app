@@ -10,6 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:browser": "node scripts/browser-smoke.mjs",
+    "test:hosting:browser": "node scripts/hosting-smoke.mjs",
+    "hosting:docker": "docker compose up --build",
     "test:agent": "python3 -m pytest agents/homework-coach-agent/tests -q",
     "coach:api": "python3 agents/homework-coach-agent/api/main.py",
     "coach:ui": "python3 agents/homework-coach-agent/ui/app.py"

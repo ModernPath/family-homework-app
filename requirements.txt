@@ -1,0 +1,4 @@
+# Minimal hosted API: no Gemini client, dotenv loader, Flask or file memory.
+fastapi==0.135.1
+pydantic==2.13.5
+uvicorn==0.41.0

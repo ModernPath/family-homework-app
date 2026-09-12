@@ -1,0 +1,17 @@
+.git
+.env
+.env.*
+**/.env
+**/.env.*
+**/__pycache__
+**/.venv*
+**/memory/data
+node_modules
+dist
+dev-dist
+coverage
+tests
+scripts
+docs
+specs
+*.log
