@@ -10,33 +10,39 @@ User requested ready-made Docker and Vercel examples for the existing training
 application. Keep the browser-local household store and existing coach response
 contract. Add a stateless hosting adapter around the deterministic Python core.
 The original local API/CLI retains its file memory; it is not exposed by these
-deployments. No accounts, cloud household sync, model calls or paid resources are
-introduced. This is a synthetic-data hosting exercise, not the auth exercise.
+deployments. The hosted deployment uses one shared family password and signed
+stateless sessions; it does not introduce accounts, cloud household sync,
+model calls or paid resources. User-specific auth remains a follow-up feature.
 
 ## Acceptance criteria
 
-- AC1: Given a built app, Docker serves `/`, `/coach`, `/setup`, `/week` and
-  assets, and `/agent-api/coach/ask` returns the current structured coach answer.
-- AC2: Given the Vercel entrypoint, the same request returns the same answer;
-  Vercel configuration routes API requests ahead of SPA fallback.
-- AC3: Given two independent clients, an answer uses only that request's
-  household. `/sessions` and `/household/snapshot` are unavailable. No hosted
-  request writes server memory or calls Gemini.
+- AC1: Given a built app and an authenticated family session, Docker serves `/`,
+  `/coach`, `/setup`, `/week` and assets, and `/agent-api/coach/ask` returns the
+  current structured coach answer. Unauthenticated coach calls are rejected.
+- AC2: Given the Vercel entrypoint and configured auth secrets, the same
+  authenticated request returns the same answer; Vercel configuration routes API
+  requests ahead of SPA fallback.
+- AC3: Given two authenticated independent clients, an answer uses only that
+  request's household. `/sessions` and `/household/snapshot` are unavailable.
+  No hosted request writes server memory or calls Gemini.
 - AC4: Given invalid JSON, invalid dates/household, or an oversized request,
   return a controlled 4xx with no submitted data echoed in the error. API
   responses are not cached. Unknown API paths return JSON 404, not index.html.
-- AC5: Given a new browser at the hosted URL, create a synthetic member, use
-  Coach, reload and retain that member; a second browser starts independently.
+- AC5: Given a new browser at the hosted URL, enter the family password, create a
+  synthetic member, use Coach, reload and retain that member; a second browser
+  must authenticate independently and starts with its own local store.
 - AC6: Learner instructions explain both deployments, storage boundaries,
   secrets, logs, restart, rollback, cost controls and next auth steps honestly.
 
 ## Files and boundaries
 
 - `hosting/app.py`: hosted API factory and Docker static-serving adapter.
+- `hosting/auth.py`: password hash verification and provider-neutral sessions.
 - `api/index.py`: Vercel function entrypoint; `requirements.txt`: hosting deps.
 - `Dockerfile`, `compose.yaml`, `.dockerignore`: reproducible non-root runtime.
 - `vercel.json`, `.vercelignore`, `.python-version`: hosted build/routing.
-- `tests/hosting/test_hosting.py`, `scripts/hosting-smoke.mjs`: HTTP and browser evidence.
+- `tests/hosting/test_hosting.py`, `tests/hosting/test_auth.py`,
+  `scripts/hosting-smoke.mjs`: HTTP and browser evidence.
 - `package.json`: hosting commands; `.gitignore`: local test/build artifacts.
 - `docs/hosting.md`, `docs/subsystems/hosting/README.md`,
   `docs/subsystems/hosting/modules/app.md`, `content-plan.md`, `README.md`:

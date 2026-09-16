@@ -16,6 +16,7 @@ RUN pip install --no-cache-dir -r requirements.txt \
     && useradd --uid 10001 --create-home appuser
 COPY hosting ./hosting
 COPY agents/homework-coach-agent/homework_core.py ./agents/homework-coach-agent/homework_core.py
+COPY agents/homework-coach-agent/narrator.py ./agents/homework-coach-agent/narrator.py
 COPY --from=frontend /build/dist ./dist
 USER appuser
 EXPOSE 8080

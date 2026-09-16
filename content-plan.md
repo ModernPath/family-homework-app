@@ -10,6 +10,8 @@ product specifications remain under `specs/`; this is not a whole-repository aud
 | Hosting subsystem | T2 | Written | docs/subsystems/hosting/README.md |
 | Hosting adapter | T3 | Written | docs/subsystems/hosting/modules/app.md |
 | Hosting behavior | Spec | Local verification passed; cloud pending | specs/features/hosting-examples.md |
+| Password authentication | Feature | In Progress | specs/features/password-auth.md |
+| Security boundary | T1 | Written | docs/security.md |
 
 Start with [hosting](docs/hosting.md), then the subsystem and module. Existing
 agent behavior is specified in [homework-coach](specs/features/homework-coach.md).

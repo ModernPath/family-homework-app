@@ -28,6 +28,45 @@ laskentaa ja vastaustekstiä. Se ei kutsu Geminiä. Viikon 2 CLI ja paikallinen
 muisti säilyvät erillisinä esimerkkeinä. Avaimen lisääminen ympäristömuuttujaan
 ei kytke mallia automaattisesti tähän hosting-APIin.
 
+## Salasanasuojaus ennen julkaisua
+
+Julkaistu sovellus vaatii nyt yhden perheen yhteisen salasanan. Salasana ei ole
+frontendissä eikä Docker-imagessa: tallenna vain scrypt-hash palvelun salaisiin
+ympäristömuuttujiin. Luo hash repon juuressa:
+
+```bash
+python3 scripts/generate-password-hash.py
+# generate the independent session-signing secret
+python3 -c 'import secrets; print(secrets.token_urlsafe(32))'
+```
+
+Aseta julkaisupalvelussa nämä salaisuudet:
+
+```text
+FAMILY_APP_PASSWORD_HASH=<komennon tulostama hash>
+FAMILY_AUTH_SECRET=<vähintään 32 tavun satunnainen salaisuus>
+FAMILY_AUTH_COOKIE_SECURE=true
+```
+
+`FAMILY_AUTH_SECRET` allekirjoittaa lyhytikäisen HttpOnly-istuntoevästeen. Älä
+laita salasanaa, hashia tai allekirjoitusavainta `VITE_*`-muuttujaan, committiin,
+kuvaan tai selaimen bundleen. `/agent-api/health` on tarkoituksella julkinen
+hostin health checkiä varten; Coach ja sovelluksen kotitalousnäkymä vaativat
+istunnon.
+
+Paikallisessa HTTP-testissä Composen oletus on `FAMILY_AUTH_COOKIE_SECURE=false`.
+Tuotannossa HTTPS:n takana käytä aina arvoa `true`. Kirjautuminen ei salaa
+selaimen paikallista SQLite/OPFS-tietokantaa; se estää ulkopuolisen pääsyn
+julkaistuun sovellukseen ja Coach-APIin. Isännöintipalvelu käsittelee Coach-
+pyynnön sisältämää kopiota muistissa, joten käytä vain palvelua, johon perhe
+luottaa.
+
+Käyttäjäkohtainen kirjautuminen on seuraava vaihe. Nykyinen istunto sisältää jo
+provider-neutraalin principalin ja perhe/tenant-rajan, mutta tässä versiossa
+kaikki perheenjäsenet käyttävät yhtä salasanaa. Lisää myöhemmin käyttäjä- tai
+identiteettipalvelu `hosting/auth.py`-rajapinnan taakse ja tarkista jokaisen
+kotitalouden omistajuus palvelimella ennen jaettua pilvitallennusta.
+
 ## Reitti A: Docker omalla koneella
 
 Esiehdot: Git sekä käynnissä oleva Docker Desktop tai muu Docker Engine, jossa

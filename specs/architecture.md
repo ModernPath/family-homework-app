@@ -2,7 +2,8 @@
 
 Hosting supplement: [Docker and Vercel](../docs/hosting.md) and
 [hosting subsystem](../docs/subsystems/hosting/README.md) describe the stateless
-hosted coach adapter. The local browser store below remains unchanged.
+hosted coach adapter and its password session boundary. The local browser store
+below remains unchanged.
 
 **Status:** Draft  
 **Last updated:** 2026-09-02  
@@ -151,6 +152,14 @@ interface Store {
 **v2 extension (not built now):** `LanStore implements Store` backed by `fetch('/api/household')` + WebSocket push. UI and domain unchanged.
 
 **Optional homework coach:** `agents/homework-coach-agent/` is a separate Python process (FastAPI on port 8001). The React Coach view POSTs the in-browser household JSON to `/agent-api/coach/ask`. Domain rules stay in TypeScript; the agent reimplements the same rotation/points math for explanations only. The kitchen board still works if the API is down.
+
+**Hosted access control:** The Docker/Vercel adapter requires a deployment-only
+family password hash and signing secret. It issues a short-lived HttpOnly
+session cookie and exposes a provider-neutral principal (`subject`, `tenant_id`,
+`roles`, issued/expiry times) to protected routes. The first release has one
+shared family principal; a future user-auth provider can replace password
+verification and add household membership checks without changing the coach or
+browser store contracts.
 
 ---
 

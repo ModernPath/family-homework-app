@@ -122,6 +122,16 @@ const en = {
   "coach.thinking": "Thinking…",
   "coach.unavailable": "Coach is unavailable. Start the homework coach API.",
 
+  "auth.title": "Family access",
+  "auth.description": "Enter the family password to open your task board.",
+  "auth.password": "Password",
+  "auth.unlock": "Unlock",
+  "auth.checking": "Checking access…",
+  "auth.loggingIn": "Unlocking…",
+  "auth.invalid": "That password is not correct.",
+  "auth.unavailable": "Family access is unavailable. Check the app configuration.",
+  "auth.logout": "Lock",
+
   "weekday.mon": "Mon",
   "weekday.tue": "Tue",
   "weekday.wed": "Wed",
@@ -249,6 +259,16 @@ const fi: Record<MessageKey, string> = {
   "coach.open": "auki",
   "coach.thinking": "Mietitään…",
   "coach.unavailable": "Valmentaja ei ole käytettävissä. Käynnistä homework coach API.",
+
+  "auth.title": "Perheen käyttöoikeus",
+  "auth.description": "Avaa tehtävätaulu kirjoittamalla perheen salasana.",
+  "auth.password": "Salasana",
+  "auth.unlock": "Avaa",
+  "auth.checking": "Tarkistetaan käyttöoikeutta…",
+  "auth.loggingIn": "Avataan…",
+  "auth.invalid": "Salasana ei ole oikein.",
+  "auth.unavailable": "Perheen käyttöoikeus ei ole käytettävissä. Tarkista asetukset.",
+  "auth.logout": "Lukitse",
 
   "weekday.mon": "Ma",
   "weekday.tue": "Ti",

@@ -80,6 +80,7 @@ export async function askHomeworkCoach(input: {
   const response = await fetch(`${coachApiBase()}/coach/ask`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify({
       household: input.household,
       query: input.query,

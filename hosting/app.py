@@ -4,14 +4,15 @@ from pathlib import Path
 import sys
 from typing import Literal
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field, field_validator
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "agents/homework-coach-agent"))
-from homework_core import answer_query
+from hosting.auth import AuthPrincipal, AuthService
+from hosting.coach import coach_answer
+from hosting.coach import gemini_configured
 
 MAX_BODY = 256 * 1024
 
@@ -82,7 +83,12 @@ class CoachRequest(BaseModel):
         return value
 
 
-def create_app(static_dir: Path | None = None) -> FastAPI:
+class LoginRequest(BaseModel):
+    password: str = Field(min_length=1, max_length=256)
+
+
+def create_app(static_dir: Path | None = None, auth: AuthService | None = None) -> FastAPI:
+    auth_service = auth or AuthService.from_environment()
     app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
     app.add_middleware(BoundedBody)
 
@@ -103,13 +109,77 @@ def create_app(static_dir: Path | None = None) -> FastAPI:
 
     @app.get("/agent-api/health")
     def health():
-        return {"status": "ok", "mode": "stateless-demo"}
+        return {
+            "status": "ok",
+            "mode": "stateless-demo",
+            "coach_narration": "gemini" if gemini_configured() else "template",
+        }
+
+    def require_auth(request: Request) -> AuthPrincipal | None:
+        if not auth_service.config.enabled:
+            return None
+        if not auth_service.configured:
+            raise HTTPException(status_code=503, detail="Authentication unavailable")
+        principal = auth_service.principal_from_cookie(
+            request.cookies.get(auth_service.config.cookie_name)
+        )
+        if principal is None:
+            raise HTTPException(status_code=401, detail="Authentication required")
+        return principal
+
+    @app.get("/agent-api/auth/session")
+    def auth_session(request: Request):
+        if not auth_service.config.enabled:
+            return {"authenticated": True, "auth_required": False}
+        principal = auth_service.principal_from_cookie(
+            request.cookies.get(auth_service.config.cookie_name)
+        )
+        return {"authenticated": principal is not None, "auth_required": True}
+
+    @app.post("/agent-api/auth/login")
+    def auth_login(payload: LoginRequest):
+        if not auth_service.config.enabled:
+            return {"authenticated": True, "auth_required": False}
+        if not auth_service.configured:
+            raise HTTPException(status_code=503, detail="Authentication unavailable")
+        if not auth_service.verify_password(payload.password):
+            raise HTTPException(status_code=401, detail="Invalid password")
+        token, _principal = auth_service.issue_session()
+        response = JSONResponse({"authenticated": True, "auth_required": True})
+        response.set_cookie(
+            auth_service.config.cookie_name,
+            token,
+            max_age=auth_service.config.session_seconds,
+            httponly=True,
+            secure=auth_service.config.cookie_secure,
+            samesite="lax",
+            path="/",
+        )
+        return response
+
+    @app.post("/agent-api/auth/logout")
+    def auth_logout():
+        response = JSONResponse(
+            {"authenticated": False, "auth_required": auth_service.config.enabled}
+        )
+        response.delete_cookie(
+            auth_service.config.cookie_name,
+            secure=auth_service.config.cookie_secure,
+            httponly=True,
+            samesite="lax",
+            path="/",
+        )
+        return response
 
     @app.post("/agent-api/coach/ask")
-    def ask(payload: CoachRequest):
+    def ask(payload: CoachRequest, _principal: AuthPrincipal | None = Depends(require_auth)):
         try:
-            return answer_query(payload.household.model_dump(), payload.query,
-                                date=payload.date.isoformat(), locale=payload.locale)
+            return coach_answer(
+                payload.household.model_dump(),
+                payload.query,
+                date=payload.date.isoformat(),
+                locale=payload.locale,
+            )
         except (ValueError, TypeError, KeyError, AttributeError, OverflowError):
             raise HTTPException(status_code=422, detail="Invalid household data") from None
 

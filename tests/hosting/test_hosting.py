@@ -11,13 +11,14 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 from hosting.app import create_app
+from hosting.auth import AuthService, hash_password
 
 
 @pytest.fixture
 def client(tmp_path):
     (tmp_path / "index.html").write_text("<html>training app</html>")
     (tmp_path / "asset.js").write_text("console.log('asset')")
-    return TestClient(create_app(tmp_path))
+    return TestClient(create_app(tmp_path, auth=AuthService.disabled()))
 
 
 def payload(name="Learner A"):
@@ -81,13 +82,15 @@ def test_body_limit_also_applies_without_content_length(client):
     assert client.post("/agent-api/coach/ask", content=iter([body[:100], body[100:]])).status_code == 413
 
 
-def test_vercel_entrypoint_contract():
+def test_vercel_entrypoint_contract(monkeypatch):
+    monkeypatch.setenv("FAMILY_APP_PASSWORD_HASH", hash_password("test-password"))
+    monkeypatch.setenv("FAMILY_AUTH_SECRET", "test-signing-secret-0123456789abcdef")
     spec = importlib.util.spec_from_file_location("vercel_entry", ROOT / "api/index.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     with TestClient(module.app) as client:
         assert client.get("/agent-api/health").json()["mode"] == "stateless-demo"
-        assert client.post("/agent-api/coach/ask", json=payload()).status_code == 200
+        assert client.post("/agent-api/coach/ask", json=payload()).status_code == 401
 
 
 def test_hosting_never_imports_file_memory(client):

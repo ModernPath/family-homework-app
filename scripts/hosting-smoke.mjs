@@ -5,6 +5,7 @@ import { execFileSync } from "node:child_process";
 import { chromium } from "playwright";
 
 const base = process.env.APP_URL ?? "http://localhost:8080";
+const testPassword = process.env.HOSTING_TEST_PASSWORD ?? process.env.FAMILY_TEST_PASSWORD;
 const browser = await chromium.launch();
 const context = await browser.newContext({ locale: "en-US" });
 const page = await context.newPage();
@@ -13,7 +14,18 @@ page.on("pageerror", error => errors.push(error.message));
 
 try {
   assert.equal((await (await fetch(`${base}/agent-api/health`)).json()).mode, "stateless-demo");
+  if (!testPassword) {
+    throw new Error("Set HOSTING_TEST_PASSWORD for the password-protected hosting smoke test");
+  }
+  const unauthenticated = await fetch(`${base}/agent-api/coach/ask`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ household: { members: [], tasks: [] } }),
+  });
+  assert.equal(unauthenticated.status, 401);
   await page.goto(`${base}/setup`);
+  await page.getByLabel("Password", { exact: true }).fill(testPassword);
+  await page.getByRole("button", { name: "Unlock", exact: true }).click();
   await page.locator(".language-switcher__btn", { hasText: "EN" }).click();
   await page.getByLabel("Name", { exact: true }).fill("Hosting Learner");
   await page.getByRole("button", { name: "Save", exact: true }).click();
@@ -52,11 +64,13 @@ try {
   const other = await browser.newContext({ locale: "en-US" });
   const otherPage = await other.newPage();
   await otherPage.goto(`${base}/setup`);
+  await otherPage.getByLabel("Password", { exact: true }).fill(testPassword);
+  await otherPage.getByRole("button", { name: "Unlock", exact: true }).click();
   await otherPage.getByLabel("Name", { exact: true }).waitFor();
   assert.equal(await otherPage.getByText("Hosting Learner", { exact: true }).count(), 0);
   await other.close();
   assert.deepEqual(errors, []);
-  console.log("PASS: hosted deep link, real task/coach request, reload persistence, separate browser; artifacts/hosting-coach.png");
+  console.log("PASS: password gate, hosted deep link, real task/coach request, reload persistence, separate browser; artifacts/hosting-coach.png");
   if (process.env.HOSTING_DOCKER_PROJECT) console.log("PASS: same browser retained household across container restart");
 } finally {
   await browser.close();
